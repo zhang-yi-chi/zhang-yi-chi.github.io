@@ -102,20 +102,27 @@
 
 
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="TE">
-<meta property="og:url" content="http://zhang-yi-chi.github.io/index.html">
+  <meta name="description" content="本文主要内容是解读《Auto-encoding variational bayes》这篇论文。一直很喜欢这种有（数学或统计）理论基础的研究，比凑出来的深度学习模型不知道要高到哪里去。 问题背景假设一组数据$X = \lbrace\mathbf{x}^{(i)}\rbrace_{i=n}^{N}$是随机生成的，并且随机生成的过程与一个隐藏变量（Latent Variable）$\mathbf{z}$">
+<meta name="keywords" content="Deep Learning,Machine Learning,VAE,Generative Model">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Variational Autoencoder">
+<meta property="og:url" content="http://zhang-yi-chi.github.io/2018/04/25/vae/index.html">
 <meta property="og:site_name" content="TE">
+<meta property="og:description" content="本文主要内容是解读《Auto-encoding variational bayes》这篇论文。一直很喜欢这种有（数学或统计）理论基础的研究，比凑出来的深度学习模型不知道要高到哪里去。 问题背景假设一组数据$X = \lbrace\mathbf{x}^{(i)}\rbrace_{i=n}^{N}$是随机生成的，并且随机生成的过程与一个隐藏变量（Latent Variable）$\mathbf{z}$">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://zhang-yi-chi.github.io/2018/04/25/vae/aevb.png">
+<meta property="og:updated_time" content="2018-04-28T04:18:12.894Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="TE">
+<meta name="twitter:title" content="Variational Autoencoder">
+<meta name="twitter:description" content="本文主要内容是解读《Auto-encoding variational bayes》这篇论文。一直很喜欢这种有（数学或统计）理论基础的研究，比凑出来的深度学习模型不知道要高到哪里去。 问题背景假设一组数据$X = \lbrace\mathbf{x}^{(i)}\rbrace_{i=n}^{N}$是随机生成的，并且随机生成的过程与一个隐藏变量（Latent Variable）$\mathbf{z}$">
+<meta name="twitter:image" content="http://zhang-yi-chi.github.io/2018/04/25/vae/aevb.png">
 
 
 
 
 
 
-  <link rel="canonical" href="http://zhang-yi-chi.github.io/"/>
+  <link rel="canonical" href="http://zhang-yi-chi.github.io/2018/04/25/vae/"/>
 
 
 
@@ -125,7 +132,7 @@
   };
 </script>
 
-  <title>TE</title>
+  <title>Variational Autoencoder | TE</title>
   
 
 
@@ -172,8 +179,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
@@ -213,7 +219,7 @@
         
         
           
-          <li class="menu-item menu-item-home menu-item-active">
+          <li class="menu-item menu-item-home">
     <a href="/" rel="section">
       <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
   </li>
@@ -273,9 +279,9 @@
           
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -307,11 +313,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/25/vae/" itemprop="url">
-                  Variational Autoencoder
-                </a>
+          <h1 class="post-title" itemprop="name headline">Variational Autoencoder
               
             
           </h1>
@@ -397,9 +399,7 @@
       
 
       
-        
-          
-            <p>本文主要内容是解读《<a href="https://arxiv.org/pdf/1312.6114.pdf" target="_blank" rel="noopener">Auto-encoding variational bayes</a>》这篇论文。一直很喜欢这种有（数学或统计）理论基础的研究，比凑出来的深度学习模型不知道要高到哪里去。</p>
+        <p>本文主要内容是解读《<a href="https://arxiv.org/pdf/1312.6114.pdf" target="_blank" rel="noopener">Auto-encoding variational bayes</a>》这篇论文。一直很喜欢这种有（数学或统计）理论基础的研究，比凑出来的深度学习模型不知道要高到哪里去。</p>
 <h3 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h3><p>假设一组数据$X = \lbrace\mathbf{x}^{(i)}\rbrace_{i=n}^{N}$是随机生成的，并且随机生成的过程与一个隐藏变量（Latent Variable）$\mathbf{z}$有关，我们想要得到数据的一个（近似的）概率密度函数$p(\mathbf{x})$来代表这组数据。这个随机的生成过程有以下两步：(1) 从先验分布$p_\mathbf{\theta}(\mathbf{z})$中生成$\mathbf{z}^{(i)}$；(2) 从条件概率$p_\mathbf{\mathbf{\theta}}(\mathbf{x}|\mathbf{z})$中生成$\mathbf{x}^{(i)}$。由此，问题转换为求解$\mathbf{\theta}$。这种假设在一定程度上是合理的，比如说在MNIST手写数字数据集中，我们想生成数字“1”的图片。首先我们要确定要生成数字是“1”，这对应第一步，然后我们在目标是数字“1”的条件下，通过某些方法生成相应的图片，这对应第二步。当然，实际的情况可能要更复杂，我们往往不能确定$\mathbf{z}$究竟有什么实际含义，只知道它包含了一类数据的信息。我们对数据的概率分布$p(\mathbf{x})$感兴趣，是因为有很多实际应用需要数据的prior，比如 denoising<a href="#dvae-ref">[2]</a><a name="dvae-in"></a>, inpainting 还有 super-resolution。除此之外我们也对后验分布$p_\mathbf{\mathbf{\theta}}(\mathbf{z}|\mathbf{x})$也感兴趣，因为 latent variable $\mathbf{z}$可以当作一个数据的embedding。</p>
 <p>一般情况下，我们可以用 Maximum Likelihood，即$\mathbf{\theta} = \text{argmax}_{\mathbf{\theta}} p_\mathbf{\theta}(\mathbf{x})$ 或者 Expectation Maximization 的方法求解$\mathbf{\theta}$。但是当模型很复杂时，$p_\mathbf{\theta}(\mathbf{x}) = \int p_\mathbf{\theta}(\mathbf{z})p_\mathbf{\mathbf{\theta}}(\mathbf{x}|\mathbf{z}) d\mathbf{z}$给不出具体的公式表达（intractable），所以也就没法用ML来求解，因为我们不知道gradient的表达式。后验分布$p_\mathbf{\mathbf{\theta}}(\mathbf{z}|\mathbf{x}) = p_\mathbf{\mathbf{\theta}}(\mathbf{x}|\mathbf{z}) p_\mathbf{\theta}(\mathbf{z}) / p_\mathbf{\theta}(\mathbf{x})$也是如此，所以EM也不能用（不知道$q(\mathbf{z})$）。概率分布 intractable 的情况并不少见，比如说我们用神经网络+sigmoid/softmax来表达概率函数。Variational inference 可以用来解决intractabililty的问题。</p>
 <p>大体上来说，variational inference 是指用一个简单的，可计算的概率分布$q$来近似估计复杂分布$p$，最小化 KL divergence $D_{KL}(q || p) = \int q(\mathbf{z}) \log \frac{q(\mathbf{z})}{p(\mathbf{z})} d\mathbf{z}$。为了解决上面提到的问题，我们用一个函数$q_{\mathbf{\phi}}(\mathbf{z} | \mathbf{x})$ 来估计 intractable 的后验分布$p_\mathbf{\mathbf{\theta}}(\mathbf{z}|\mathbf{x})$，这样我们既可以近似的估计后验分布，在选择适当的条件概率$p_{\mathbf{\theta}}(\mathbf{x}|\mathbf{z})$和隐藏变量的先验分布$p_\mathbf{\theta}(\mathbf{z})$后，我们能够得到$p(\mathbf{x})$的一个近似估计。在论文<a href="#aevb-ref">[1]</a>中，作者提出了一个 variational bayes 的方法同时求解近似分布的参数$\mathbf{\phi}$和条件概率参数$\mathbf{\theta}$。算法叫 autoencoder 的原因是，可以把$q_{\mathbf{\phi}}(\mathbf{z} | \mathbf{x})$当作一个 encoder ，$p_{\mathbf{\theta}}(\mathbf{x}|\mathbf{z})$当作 decoder，最后作者结合神经网络给出的例子也确实像一个 autoencoder。</p>
@@ -430,8 +430,6 @@
 <p>pytorch 官方提供了一个简单明了的VAE实现<a href="https://github.com/pytorch/examples/tree/master/vae" target="_blank" rel="noopener">https://github.com/pytorch/examples/tree/master/vae</a>，对理解AEVB算法的整个流程很有帮助。</p>
 <h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a name="aevb-ref"></a><a href="#aevb-in">[1]</a> <a href="https://arxiv.org/pdf/1312.6114.pdf" target="_blank" rel="noopener">Kingma D P, Welling M. Auto-encoding variational bayes[J]. arXiv preprint arXiv:1312.6114, 2013.</a><br><a name="dvae-ref"></a><a href="#dvae-in">[2]</a> <a href="https://arxiv.org/pdf/1511.06406.pdf" target="_blank" rel="noopener">Im D J, Ahn S, Memisevic R, et al. Denoising Criterion for Variational Auto-Encoding Framework[C]//AAAI. 2017: 2059-2065.</a></p>
 
-          
-        
       
     </div>
 
@@ -449,177 +447,42 @@
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://zhang-yi-chi.github.io/2018/04/24/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="YZ">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="TE">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                <a class="post-title-link" href="/2018/04/24/hello-world/" itemprop="url">
-                  Hello World
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-04-24 23:03:57" itemprop="dateCreated datePublished" datetime="2018-04-24T23:03:57-04:00">2018-04-24</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2018-04-27 23:33:34" itemprop="dateModified" datetime="2018-04-27T23:33:34-04:00">2018-04-27</time>
-              
-            
-          </span>
-
+        <div class="post-tags">
           
-
+            <a href="/tags/Deep-Learning/" rel="tag"># Deep Learning</a>
           
-            
-              <span class="post-comments-count">
-                <span class="post-meta-divider">|</span>
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
-                </span>
-                <a href="/2018/04/24/hello-world/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/24/hello-world/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
+            <a href="/tags/Machine-Learning/" rel="tag"># Machine Learning</a>
           
-
+            <a href="/tags/VAE/" rel="tag"># VAE</a>
           
+            <a href="/tags/Generative-Model/" rel="tag"># Generative Model</a>
           
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>主要用来练笔，加深知识理解的博客。</p>
-
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
       
 
       
       
-        <div class="post-eof"></div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/24/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
       
     </footer>
   </div>
@@ -629,14 +492,29 @@
   </article>
 
 
-    
-  </section>
 
-  
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
           
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
 
         </div>
         
@@ -657,8 +535,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -726,6 +613,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题背景"><span class="nav-number">1.</span> <span class="nav-text">问题背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Variational-Bound"><span class="nav-number">2.</span> <span class="nav-text">Variational Bound</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Auto-Encoding-Variational-Bayes-Algorithm"><span class="nav-number">3.</span> <span class="nav-text">Auto-Encoding Variational Bayes Algorithm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Variational-Autoencoder"><span class="nav-number">4.</span> <span class="nav-text">Variational Autoencoder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">5.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -853,6 +756,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.2.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.2.0"></script>
+
+
 
   
 
@@ -867,6 +774,23 @@
     <script id="dsq-count-scr" src="https://zhang-yi-chi.disqus.com/count.js" async></script>
   
 
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'http://zhang-yi-chi.github.io/2018/04/25/vae/';
+        this.page.identifier = '2018/04/25/vae/';
+        this.page.title = 'Variational Autoencoder';
+      };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://zhang-yi-chi.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
   
 
 
@@ -908,14 +832,6 @@
   
 
   
-  
-    
-      
-        
-      
-    
-      
-    
   
 
   
