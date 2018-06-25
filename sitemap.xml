@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://zhang-yi-chi.github.io/2018/06/25/attention/</loc>
+    
+    <lastmod>2018-06-25T09:23:11.125Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://zhang-yi-chi.github.io/2018/04/25/vae/</loc>
     
-    <lastmod>2018-04-29T18:12:10.277Z</lastmod>
+    <lastmod>2018-05-01T23:37:25.229Z</lastmod>
     
   </url>
   
@@ -16,7 +23,7 @@
   </url>
   
   <url>
-    <loc>http://zhang-yi-chi.github.io/2018/04/24/hello-world/</loc>
+    <loc>http://zhang-yi-chi.github.io/2018/04/25/hello-world/</loc>
     
     <lastmod>2018-04-28T03:33:34.380Z</lastmod>
     

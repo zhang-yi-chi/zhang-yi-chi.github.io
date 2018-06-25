@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.2.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.2.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.2.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="本文介绍深度学习中一个常见的机制 Attention Model，以及其在实际场景中应用。因为 attention 是受到人类注意力（即 attention）机制启发的一类比较宽泛的想法，而不是一个具体的模型或者公式，本文的重点会放在如何在不同问题下设计 attention，希望给今后自己设计 attention 带来一些启发。">
+<meta name="keywords" content="Deep Learning,Natural Language Processing,Attention">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Attention Model">
+<meta property="og:url" content="http://zhang-yi-chi.github.io/2018/06/25/attention/index.html">
+<meta property="og:site_name" content="TE">
+<meta property="og:description" content="本文介绍深度学习中一个常见的机制 Attention Model，以及其在实际场景中应用。因为 attention 是受到人类注意力（即 attention）机制启发的一类比较宽泛的想法，而不是一个具体的模型或者公式，本文的重点会放在如何在不同问题下设计 attention，希望给今后自己设计 attention 带来一些启发。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://zhang-yi-chi.github.io/2018/06/25/attention/ram.png">
+<meta property="og:image" content="http://zhang-yi-chi.github.io/2018/06/25/attention/en-de.png">
+<meta property="og:image" content="http://zhang-yi-chi.github.io/2018/06/25/attention/bi-attention.png">
+<meta property="og:image" content="http://zhang-yi-chi.github.io/2018/06/25/attention/aynia.png">
+<meta property="og:updated_time" content="2018-06-25T09:23:11.125Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Attention Model">
+<meta name="twitter:description" content="本文介绍深度学习中一个常见的机制 Attention Model，以及其在实际场景中应用。因为 attention 是受到人类注意力（即 attention）机制启发的一类比较宽泛的想法，而不是一个具体的模型或者公式，本文的重点会放在如何在不同问题下设计 attention，希望给今后自己设计 attention 带来一些启发。">
+<meta name="twitter:image" content="http://zhang-yi-chi.github.io/2018/06/25/attention/ram.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://zhang-yi-chi.github.io/2018/06/25/attention/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Attention Model | TE</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">TE</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/about/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+    <a href="/tags/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />标签</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://zhang-yi-chi.github.io/2018/06/25/attention/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="YZ">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="TE">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Attention Model
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-06-25 17:23:11" itemprop="dateCreated datePublished" datetime="2018-06-25T17:23:11+08:00">2018-06-25</time>
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/06/25/attention/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count"
+                        data-disqus-identifier="2018/06/25/attention/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+             <span id="/2018/06/25/attention/" class="leancloud_visitors" data-flag-title="Attention Model">
+               <span class="post-meta-divider">|</span>
+               <span class="post-meta-item-icon">
+                 <i class="fa fa-eye"></i>
+               </span>
+               
+                 <span class="post-meta-item-text">阅读次数：</span>
+               
+                 <span class="leancloud-visitors-count"></span>
+             </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本文介绍深度学习中一个常见的机制 Attention Model，以及其在实际场景中应用。因为 attention 是受到人类注意力（即 attention）机制启发的一类比较宽泛的想法，而不是一个具体的模型或者公式，本文的重点会放在如何在不同问题下设计 attention，希望给今后自己设计 attention 带来一些启发。</p>
+<a id="more"></a>
+<h3 id="什么是-Attention"><a href="#什么是-Attention" class="headerlink" title="什么是 Attention"></a>什么是 Attention</h3><p>一般在处理图像的时候，是将图片或者图片的一部分经过预处理，作为一个整体输入到模型当中，输入层图片的不同位置没有任何区分，模型（比如 CNN）在处理的时候可能会给图片的不同区域不同的权重。然而，人眼在处理的图片的时候，首先会将注意力集中在图片的某个感兴趣的区域上，并且模糊区域周围的图片，即人眼直视的区域和余光的区别。attention Model 就是受到人的注意力机制的启发，显示地模拟注意力的方法。同样，在自然语言处理（NLP）领域中，attention 机制也很多应用，事实上现在主流的 NLP 模型都会在某一步中用到 attention。比如在神经机器翻译任务（Neural Machine Translation, Attention Model” 翻译为“注意力 模型”，显然 “attention” 这个词对“注意力”这个翻译相比“Model”起到了更大的（决定性的）作用。在<a href="https://en.wikipedia.org/wiki/Question_answering" target="_blank" rel="noopener">问答系统</a>（Question and Answering, QA）中，我们需要关注的往往是问题里的关键词，像是 a, and, the 这一类的 stop words 往往不是非常重要。</p>
+<p>总结来说，attention Model 就是在传到模型下一层之前，给予 input features 不同的权重（attention）的方法。这个方法灵活性很大，input features 可以是模型最开始输入层的数据，也可以是中间某一个隐藏层的一系列特征向量。同时，计算权重的方法也多种多样。下面会具体介绍一些论文中设计 attention Model 的方法。</p>
+<h3 id="Recurrent-Models-of-Visual-Attention"><a href="#Recurrent-Models-of-Visual-Attention" class="headerlink" title="Recurrent Models of Visual Attention"></a><a href="http://papers.nips.cc/paper/5542-recurrent-models-of-visual-attention.pdf" target="_blank" rel="noopener">Recurrent Models of Visual Attention</a></h3><p>这篇论文是 attention 在图像处理领域的应用。<a href="https://github.com/zhang-yi-chi/recurrent-models-of-visual-attention" target="_blank" rel="noopener">这里</a>有一个 Pytorch 写的代码，训练30个 epochs 内能达到还不错的结果。</p>
+<p>人在观察一幅图像时，会首先关注图像的一个区域，然后转向下一个感兴趣的区域，并重复这个过程直到掌握足够多的信息。受到这个现象的启发，本文将图像处理的过程转换为：(1) 从上一部选择的图片的区域中提取信息；（2）根据信息选择下一个区域，以及一个可能的环境动作。这个 sequential 过程用 RNN 来表示，并在 Reinforcement Learning （RL） 的框架下训练，被称作 Recurrent Attention Model （RAM）。这里图片的区域相当于 RL 中的 Observation，State 是之前所有的历史信息，选择下一个区域和环境动作是 Actions。 由于这篇博客的重点是 attention，就不详细介绍 RL 了。环境动作根据不同的任务有不同的设置。如果是一个分类问题，本文中会首先固定这个过程一共执行多少步，模型只会在最后一步时选择环境动作，这个动作是图片分类的结果。如果 RAM 模型应用在电子游戏中，环境动作就是可操纵物体的动作，比如上下左右之类的，而这个动作可能会影响到图片（即 Environment）本身，这也就是说在 RAM 中提供区域的图像本身也会随着整个过程变化。RL 的奖励（Reward）根据任务不同也有不同的设置，比如在图片分类中，本文设置最后分类正确的奖励是1，分类错误，以及之前所有步骤的奖励都是0。RAM 可以有效地减少计算量，因为每次输入的可以是一个固定大小的区域，这样计算就和图片大小本身没有关系。</p>
+<p>上述过程可以总结为如下几步，在第 t 步时：</p>
+<ul>
+<li>计算 feature。根据当前图片 $x_t$ 和上一步中得到的位置动作 $l_{t-1}$, 可以得到一个局部的 retina-like representation $\rho(x_t, l_{t-1})$。这里$\rho$是一个越远离中心 $l_{t-1}$ 像素越低的图像表示，在论文里被称作 glimpse，起到模拟 attention 机制的作用，同时达到了减少输入维度的效果。结合局部图像表示与位置信息，通过 glimpse network $f_g$ 得到 glimpse feature $g_t = f_g(x_t, l_{t-1}; \theta_g)$。这里位置信息 $l_{t-1}$ 除了用于生成 $\rho_t$，还用来和 $\rho_t$ 一起生成 $g_t$，所以实际上可以表达为 $g_t = f_g(\rho(x_t, l_{t-1}), l_{t-1}; \theta_g)$。</li>
+<li>计算当前 internal state。根据历史信息 $h_{t-1}$，通过 core network 计算出当前 state $h_t = f_h(h_{t-1}, g_t; \theta_h)$。</li>
+<li>计算下一个位置 $l_t$ 和动作 $a_t$。位置 $l_t$ 从一个由 location network 定义的概率分布中抽样 $l_t \sim p(\cdot | f_l(h_t; \theta_l))$。动作 $a_t$ 从一个由 action network 定义的概率分布中抽样 $a_t \sim p(\cdot | f_a(h_t; \theta_a))$。</li>
+</ul>
+<p>训练的目标是为了得到一个概率策略（stochastic policy）$\pi((l_t, a_t) | s_{1:t}; \theta)$ 来最大化期望奖励 $\mathbb{E}_{p(s_{1:T}; \theta)}[R]$，这里 $s_{1:t}$ 代指之前的所有动作，位置，图片信息 $(l_i, a_i, x_i)$，$p(s_{1:T}; \theta) = \Pi_{t=1}^T \pi((l_t, a_t) | s_{1:t}; \theta)$。参考 <a href="/2018/04/25/vae/" title="Variational Autoencoder">Variational Autoencoder</a> 中公式(4)的推导，可以得到目标函数的 gradient<br>$$\nabla_{\theta} J = \sum_{t=1}^{T} \mathbb{E}_{p(s_{1:T}; \theta)} [\nabla_{\theta} \log \pi((l_t, a_t) | s_{1:t}; \theta)R] \simeq \frac{1}{M} \sum_{i=1}^{M} \sum_{t=1}^{T} \nabla_{\theta} \log \pi((l_t, a_t)^{i} | s_{1:t}^i; \theta)R^i \tag{1}$$</p>
+<p>用来自论文的示意图来表示上述流程：<br><img src="/2018/06/25/attention/ram.png" title="Recurrent Attention Model"></p>
+<p>具体到图像分类问题和电子游戏问题中的 $f_*$ 如何定义，原文中有详细的描述，这里就不重复了。值得注意的是，在图像分类问题中，Local network $f_l$ 可以用公式(1)来训练，$f_a$ 则通过由 cross entropy loss 定义的分类损失函数训练。</p>
+<p><strong>RAM 中， attention 加在模型的输入层，attention 的权重与当前输入图片和前一步计算得到的图片位置有关，通过一个 reccurrent 的结构计算加权后的输入 $\rho(x_t, l_{t-1})$。</strong></p>
+<h3 id="Neural-Machine-Translation-By-Jointly-Learning-To-Align-And-Translate"><a href="#Neural-Machine-Translation-By-Jointly-Learning-To-Align-And-Translate" class="headerlink" title="Neural Machine Translation By Jointly Learning To Align And Translate"></a><a href="https://arxiv.org/pdf/1409.0473.pdf" target="_blank" rel="noopener">Neural Machine Translation By Jointly Learning To Align And Translate</a></h3><p>这篇文章是 attention 在 NMT 中的应用，应该是最早的一篇 attention 在深度 NLP 中的应用。</p>
+<p>这篇文章发表之前效果做好的 NMT 模型使用的是 Encoder-Decoder 结构，参见 <a href="https://www.aclweb.org/anthology/D14-1179" target="_blank" rel="noopener">Cho et al.</a> 和 <a href="https://arxiv.org/pdf/1409.3215.pdf" target="_blank" rel="noopener">Sutskever et al.</a>。简单来说，模型中的 Encoder 负责将输入文本 encode 成一个固定长度的向量 $c$，并期望其中包含了输入文本的全部信息；Decoder 负责将 $c$ decode 成目标语言语句。由于语言本身的 sequential 特性，Encoder 和 Decoder 可以用 RNN 结构实现，比如 LSTM、 biLSTM，当然现在 CNN 也有很大的优势。下面以 RNN 为例给出一个比较正式的 Encoder-Decoder 定义。</p>
+<h4 id="Encoder-Decoder-结构"><a href="#Encoder-Decoder-结构" class="headerlink" title="Encoder-Decoder 结构"></a>Encoder-Decoder 结构</h4><p>给定一个句子 $\mathbf{x} = (x_1, x_2, …, x_T)$ ，这里 $x_t$ 是一个单词的词向量（embedding）。Encoder 以这个句子作为输入，利用 RNN 将其 encode 为一个向量 $c$，具体有<br>$$h_t = f(x_t, h_{t-1})$$</p>
+<p>$$c = q(h_1, h_2, …, h_T)$$</p>
+<p>其中 $h_t$ 是 RNN 的 hidden state。上面提到的两个论文都是用 $q(h_1, h_2, …, h_T) = h_T$ 的形式。接下来，利用另一个 RNN 来生成/预测目标语言的结果 $\mathbf{y} = (y_1, y_2, …, y_T)$。RNN 定义了一个条件概率函数<br>$$p(\mathbf{y}) = \Pi_{t=1}^T p(y_t | y_1, y_2, …, y_{t-1}, c)$$</p>
+<p>$$p(y_t | y_1, y_2, …, y_{t-1}, c) = g(y_{t-1}, s_t, c) \tag{2}$$</p>
+<p>$$s_t = f’(s_{t-1}, y_{t-1}, c) \tag{3}$$</p>
+<p>其中 $s_t$ 是 RNN 的 hidden state，$g$ 是一个 softmax 分类器。</p>
+<h4 id="Attention"><a href="#Attention" class="headerlink" title="Attention"></a>Attention</h4><p>Encoder-Decoder 结构有一个问题，就是无论句子有多长，最后得到的都是一个固定长度的向量，那么长句子所得到的向量中每个词的信息就会少。同时，在第一节翻译的例子也提到，输入句子中不同的词，对于输出翻译句子中的不同的词的贡献是不一样的，这一点在 Encoder-Decoder 中没有得到体现，因为无论生成的哪一个 $y_t$，输入句子提供的信息都是 $c$。attention Model 可以帮助解决这个问题。不过 attention 在本文中是被称作 alignment，即翻译中的每个词和输入的每个词对齐，意思上感觉差不多。</p>
+<p>本文中将 Decoder 中的条件概率（公式(2)）和 RNN （公式(3)）改为<br>$$p(y_i | y_1, y_2, …, y_{i-1}, \mathbf{x}) = g(y_{i-1}, s_i, c_i) \tag{4}$$</p>
+<p>$$s_i = f’(s_{i-1}, y_{i-1}, c_i) \tag{5}$$</p>
+<p>这里 Encoder 不在生成唯一的向量 $c$，而是针对不同的 $s_t$，利用所有的 hidden state $\lbrace h_1, h_2, …, h_T \rbrace$ 生成<br>$$c_i = \sum_{j=1}^{T_{x}} \alpha_{ij}h_j \tag{6}$$</p>
+<p>$\alpha_{ij}$ 就是本文中 attention 的权重，由如下公式计算得到<br>$$\alpha_{ij} = \frac{\exp(e_{ij})}{\sum_{k=1}^{T_{x}} \exp(e_{ik})}$$</p>
+<p>$$e_{ij} = a(s_{i-1}, h_j)$$</p>
+<p>其中函数 $a(\cdot)$ 可以是一个神经网络。这里作者期望 $a(\cdot)$ 可以学习到对于接下来要生成的词 $y_i$，哪一个输入单词（的 hidden state）更重要。论文中的 Figure 3 证明该模型确实学习到了单词的对应关系。</p>
+<p>用来自论文的示意图来表示 attention 部分，因为论文中使用的是 biLSTM，所以隐藏层有两层，不过原理是一样的，$h_t = [\overrightarrow{h_t};\overleftarrow{h_t}]$ 由两个方向的 hidden state 首尾相接而成。<br><img src="/2018/06/25/attention/en-de.png" title="Encoder-Decoder attention"></p>
+<p><strong>该模型中， attention 加在模型的 Encoder 和 Decoder 中间，attention 权重与 RNN 模型前一个输入和当前 hidden state 有关， 通过一个神经网络计算 $a(s_{i-1}, h_j)$。</strong></p>
+<h3 id="Bi-Directional-Attention-Flow-For-Machine-Comprehension"><a href="#Bi-Directional-Attention-Flow-For-Machine-Comprehension" class="headerlink" title="Bi-Directional Attention Flow For Machine Comprehension"></a><a href="https://arxiv.org/pdf/1611.01603.pdf" target="_blank" rel="noopener">Bi-Directional Attention Flow For Machine Comprehension</a></h3><p>这篇文章是 attention 在 Question Answering (QA) 中的应用，用到一个著名的 QA 数据集，Stanford Question Answering Dataset (SQuAD)。SQuAD 数据集由 Wikipedia 的文章 context，与文章相关的问题 query 以及答案组成，其中问题的答案是该文章中的一段话。解决 QA 问题的模型需要根据问题和文章内容，输出答案在文章中的开始位置和结束位置。这篇文章中用到的 attention 我觉得还是很合理的，比较有借鉴意义。</p>
+<h4 id="模型结构"><a href="#模型结构" class="headerlink" title="模型结构"></a>模型结构</h4><p>本文的模型一共分为6层，这里先简单介绍一下模型的结构，之后重点解释一下和 attention 相关的运算。模型有两个输入，context sentence $\lbrace \mathbf{x_1}, \mathbf{x_2}, …, \mathbf{x_T} \rbrace$ 和 query sentence $\lbrace \mathbf{q_1}, \mathbf{q_2}, …, \mathbf{q_J} \rbrace$。之后各自经过三种（算作3层） embedding layers, character embeddings with CNN, pretained word embedding 和 contextual embedding using bi-LSTM 得到两组 embedding vectors：context vectors $\mathbf{H} \in \mathbb{R}^{2d \times T}$ 和 query vectors $\mathbf{U} \in \mathbb{R}^{2d \times J}$。接下来，经过 Attention Flow Layer，得到 query-aware context vectors $\mathbf{G} \in \mathbb{R}^{* \times T}$，也就是说利用 query vectors，通过一种加权的方法，得到了新的 context vectors。之后 $\mathbf{G}$ 会传入由 bi-LSTM 组成的 Model Layer，得到加入 attention 后的 context vectors 的 contextual embedding $\mathbf{M} \in \mathbb{R}^{2d \times T}$，和之前的第3层起到同样的效果。最后由 $\mathbf{G}$ 和 $\mathbf{M}$ 一起通过一个 softmax function 得到起始位置，M 经过另一个 LSTM 得到进一步的 encoding vectors $\mathbf{M}^2$，由 $\mathbf{G}$ 和 $\mathbf{M}^2$ 得到终止位置。论文中的模型示意图如下</p>
+<img src="/2018/06/25/attention/bi-attention.png" title="Bi-Directional Attention Flow For Machine Comprehension">
+<h4 id="Bi-Attention"><a href="#Bi-Attention" class="headerlink" title="Bi-Attention"></a>Bi-Attention</h4><p>Bi-Attention 指的两个方向的 attention，Context-to-query Attention 和 Query-to-context Attention，简单的总结一下就是 query vectors 关于每个 context word 的加权求和（一共 T 个），以及根据 query 得到 context words 中单词重要程度的加权求和（1个）。</p>
+<p>为了计算 Bi-Attention，首先需要得到一个 context words 和 query words 的相似度矩阵（similarity matrix） $\mathbf{S} \in \mathbb{R}^{T \times J}$，其中 $\mathbf{S}_{tj}$ 是 context 中第 t 个单词和 query 中第 j 个单词的相似度。论文中相似度由一个线性函数 $\alpha$ 计算得到：<br>$$\mathbf{S}_{tj} = \alpha(\mathbf{H}_{:t}, \mathbf{U}_{:j}) = \alpha(\mathbf{h}, \mathbf{u}) = \mathbf{w}_{(\mathbf{S})}^T [\mathbf{h};\mathbf{u};\mathbf{h} \circ \mathbf{u}]$$</p>
+<p>其中 $[\mathbf{h};\mathbf{u};\mathbf{h} \circ \mathbf{u}]$ 是向量 $\mathbf{h}$，$\mathbf{u}$，$\mathbf{h} \circ \mathbf{u}$ 首尾相连得到，$\circ$ 代表 element-wise 乘法。论文中的 Figure 3 证明这样得到的相似度矩阵确实起到了预想中的作用。</p>
+<p><strong>Context-to-query Attention (C2Q)。</strong> 对于一个 context word，C2Q 能够计算出我们更需要 关注/注意 哪一个 query word。$\mathbf{a}_t \in \mathbb{R}^J$ 表示给定第 t 个 context word 时 query words 的注意力权重（attention weights），$\mathbf{a}_t = \text{softmax}(S_{t:})$。这个公式的意思是，注意力权重 $\mathbf{a}_t$ 的大小由第 t 个 context word 和每个 query words 的相似度大小决定。之后，我们就能计算出与第 t 个 context word 相关的 query words 的加权平均（文中称为 attended query vectors） $\tilde{\mathbf{U}}_{:t} = \sum_j a_{tj} \mathbf{U}_{:j}$。$\tilde{\mathbf{U}} \in \mathbb{R}^{2d \times T}$。</p>
+<p><strong>Query-to-context Attention (Q2C)。</strong> Q2C 只得到一个向量，这个向量表达的是所有跟 query 相关的 context words 的加权平均，即从文章中选出对问题很重要的那些单词。Attention weights $\mathbf{b} = \text{softmax}(\max_{\text{col}} (\mathbf{S})) \in \mathbb{R}^T$，其中 $\max_{\text{col}} (\mathbf{S})$ 的第 t 个维度 $\max_{\text{col}} (\mathbf{S})_t$ 表示的是第 t 个 context word 与所有 query words 的相似度 $\mathbf{S}_{t:}$ 中最大的那个，也就是第 t 个 context word 与问题中最相关的单词的相关度。$\mathbf{b}_t$ 可以作为第 t 个 context word 与问题相关性的一个度量。这样，我们可以计算出 $\tilde{\mathbf{h}} = \sum_t \mathbf{b}_t \mathbf{H}_{:t} \in \mathbb{R}^{2d}$，表示所有context 中与问题相关的单词的集合。$\tilde{\mathbf{H}} \in \mathbb{R}^{2d \times T}$ 是 $\tilde{\mathbf{h}}$ 重复 T 遍的结果。</p>
+<p>最后，我们可以用$\mathbf{H}_{:t}$，$\tilde{\mathbf{U}}_{:t}$ 和 $\tilde{\mathbf{H}}_{:t}$ 来表示加入 attention 信息后的第 t 个 context word vector $\mathbf{G}_t = \beta(\mathbf{H}_{:t}, \tilde{\mathbf{U}}_{:t}, \tilde{\mathbf{H}}_{:t}) \in \mathbb{R}^{*}$，这其中蕴含了第 t 个单词的 embedding 本身，所有与该词相关的 query words 的信息，以及整个文章 context 中与问题 query 有关的单词的信息。本文用的是$\beta(\mathbf{H}_{:t}, \tilde{\mathbf{U}}_{:t}, \tilde{\mathbf{H}}_{:t}) = [\mathbf{h};\tilde{\mathbf{u}};\mathbf{h} \circ \tilde{\mathbf{u}};\mathbf{h} \circ \tilde{\mathbf{h}}] \in \mathbb{R}^{8d}$。从直觉上来说，我感觉文章单词的 embedding 和 $\tilde{\mathbf{H}}_{:t}$ 应该没有多大关系，因为它表示的是整篇文章（关于问题）的信息。结果（Table 1b）也证明了 C2Q 确实更重要一点，不过 Q2C 也会提高模型的效果就是了。</p>
+<p><strong>该模型中的 attention 是双向的。我们会根据问题，重点关注文章中的某些单词（Q2C）；在浏览文章中的每一个单词时，我们则会考虑它和问题中的哪一部分相关（C2Q）。</strong></p>
+<h3 id="Attention-Is-All-You-Need"><a href="#Attention-Is-All-You-Need" class="headerlink" title="Attention Is All You Need"></a><a href="https://arxiv.org/pdf/1706.03762.pdf" target="_blank" rel="noopener">Attention Is All You Need</a></h3><p>标题口气不小，实际来看标题大概想表达的是 attention is all they used。这篇文章仍然是 attention 在 NMT 上的应用，不同于之前的模型，他们提出的模型 Transformer 没有用到 convoluion 或者 recurrent layer，而是利用 attention 来完成所有的工作，并取得很好的效果。在文章第四章中，作者讨论了为什么用 attention 来替代 CNN 或 RNN，其中一个最大的原因就是获得 long-range dependencies 所需要的计算量。如果句子长度为n，那么 RNN 需要 $O(n)$ 次 recurrent 计算才能获得首尾单词的 dependency，dilated CNN 需要 $O(\log_kn)$ 次 convolution 计算当 kernel 大小是 $k$ 时。而本文中提出的 self-attention 只需要常数次运算。另外还有一点就是 RNN 的计算方式不利于大规模并行实现。</p>
+<p>本文首先对 attention 做了一个定义。一个 attention function 将一个 query，几对儿 key-values 映射到一个 output。其中 query, keys, values, output 都是向量。output 是 values 的一个加权求和，其中权重是由 query 及对应的 keys 计算的来的。文章并没有给出这么定义的 intuition，实验部分也没有特别给出关于 query, keys, values 的可视化表示，只能说非常遗憾。有了 Attention 的定义之后，输入维数为 $d_k$ 的 query， $s \times d_k$ 的 keys 向量，以及 $s \times d_v$ 的 values 向量（这里 $s$ 是 key-value pairs 的数量，论文中并没有明确地表示出来），文章定义 Scaled Dot-Product Attention<br>$$\text{Attention}(Q, K, V) = \text{softmax}(\frac{QK^T}{\sqrt{d_k}})V$$</p>
+<p>其中 $\sqrt{d_k}$ 是为了防止 gradient saturation 的一个 trick。</p>
+<p>文章利用 Scaled Dot-Product Attention 定义了 Multi-Head Attention 作为模型中的 attention function，作者只提出这么做效果会好，并没有说明为什么，以及是怎么想到的。在我看来这个 Multi-Head 实际上和 CNN 里面多个 kernel 的效果是一样的，不同 Head 捕捉不同的信息。正式定义如下，假设使用 $h$ 个 Head：<br>$$\text{MultiHead}(Q, K, V) = \text{Concat}(\text{head}_1, …, \text{head}_h) W^O$$</p>
+<p>$$\text{head}_i = \text{Attention}(QW_i^Q, KW_i^K, VW_i^V)$$</p>
+<p>模型仍然是一个 Encoder-Decoder 结构，不同的是，Decoder 利用上三角 mask 矩阵得到一个 auto-regressive 的结构，从而达到预测输出的第 i 个词的时候 $\text{Attention}[i::] = 0$，这是为了保证预测不依靠句子后面单词的信息。除此之外还有一系列的 trick，感觉也是谷歌典型的那种 天花乱坠的结构 + 复杂 engineering 的模型。<a href="https://github.com/jadore801120/attention-is-all-you-need-pytorch" target="_blank" rel="noopener">这里</a>有一个 pytorch 的实现，对了解模型中用到的 trick 和理解整个模型很有帮助。总体结构如下图所示<br><img src="/2018/06/25/attention/aynia.png" title="Attention Is All You Need"></p>
+<p>从图中可以看出，<strong>Encoder 中 Multi-Head Attention 输入的 Q, K, V 均为输入的 input，文章中称为 self-attention。Decoder 中 同样含有 self-attention，同时还有使用 Encoder 的输出作为 V 和 K 的另一种 Attention 模式。</strong></p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>Attention 的形式多种多样，本文介绍了4种在不同领域中应用 Attention 取得更好效果的模型。简单来说， Attention 是根据不同的上下文环境（context）改变模型某一层输入的方法，这种改变可以是加权平均，也可以是更加复杂的方法，比如 Google 的 Multi-Head Attention，或者像是第一篇中剪裁不同位置的图片。在自然语言处理中，上下文环境一般是指语境，在 QA 问题中，问题和原文可以互为环境。Attention 的目的是根据不同的环境区分输入，从而更好的利用输入信息。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Deep-Learning/" rel="tag"># Deep Learning</a>
+          
+            <a href="/tags/Natural-Language-Processing/" rel="tag"># Natural Language Processing</a>
+          
+            <a href="/tags/Attention/" rel="tag"># Attention</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/25/vae/" rel="next" title="Variational Autoencoder">
+                <i class="fa fa-chevron-left"></i> Variational Autoencoder
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>
+          Please enable JavaScript to view the
+          <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+        </noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">YZ</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是-Attention"><span class="nav-number">1.</span> <span class="nav-text">什么是 Attention</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Recurrent-Models-of-Visual-Attention"><span class="nav-number">2.</span> <span class="nav-text">Recurrent Models of Visual Attention</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Neural-Machine-Translation-By-Jointly-Learning-To-Align-And-Translate"><span class="nav-number">3.</span> <span class="nav-text">Neural Machine Translation By Jointly Learning To Align And Translate</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Encoder-Decoder-结构"><span class="nav-number">3.1.</span> <span class="nav-text">Encoder-Decoder 结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Attention"><span class="nav-number">3.2.</span> <span class="nav-text">Attention</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bi-Directional-Attention-Flow-For-Machine-Comprehension"><span class="nav-number">4.</span> <span class="nav-text">Bi-Directional Attention Flow For Machine Comprehension</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#模型结构"><span class="nav-number">4.1.</span> <span class="nav-text">模型结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Bi-Attention"><span class="nav-number">4.2.</span> <span class="nav-text">Bi-Attention</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Attention-Is-All-You-Need"><span class="nav-number">5.</span> <span class="nav-text">Attention Is All You Need</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">6.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">YZ</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动 v3.7.1</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/theme-next/hexo-theme-next">NexT.Muse</a> v6.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.2.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.2.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.2.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.2.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.2.0"></script>
+
+
+
+  
+
+  
+    <script id="dsq-count-scr" src="https://zhang-yi-chi.disqus.com/count.js" async></script>
+  
+
+  
+    <script type="text/javascript">
+      var disqus_config = function () {
+        this.page.url = 'http://zhang-yi-chi.github.io/2018/06/25/attention/';
+        this.page.identifier = '2018/06/25/attention/';
+        this.page.title = 'Attention Model';
+      };
+      function loadComments () {
+        var d = document, s = d.createElement('script');
+        s.src = 'https://zhang-yi-chi.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', '' + +new Date());
+        (d.head || d.body).appendChild(s);
+      }
+      
+        loadComments();
+      
+    </script>
+  
+
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+  <script src="https://cdn1.lncld.net/static/js/av-core-mini-0.6.4.js"></script>
+  <script>AV.initialize("Azty1QN0ADQPwIVVydnL3KsR-gzGzoHsz", "f0RixT1jNefcHmmXrkgMtEwR");</script>
+  <script>
+    function showTime(Counter) {
+      var query = new AV.Query(Counter);
+      var entries = [];
+      var $visitors = $(".leancloud_visitors");
+
+      $visitors.each(function () {
+        entries.push( $(this).attr("id").trim() );
+      });
+
+      query.containedIn('url', entries);
+      query.find()
+        .done(function (results) {
+          var COUNT_CONTAINER_REF = '.leancloud-visitors-count';
+
+          if (results.length === 0) {
+            $visitors.find(COUNT_CONTAINER_REF).text(0);
+            return;
+          }
+
+          for (var i = 0; i < results.length; i++) {
+            var item = results[i];
+            var url = item.get('url');
+            var time = item.get('time');
+            var element = document.getElementById(url);
+
+            $(element).find(COUNT_CONTAINER_REF).text(time);
+          }
+          for(var i = 0; i < entries.length; i++) {
+            var url = entries[i];
+            var element = document.getElementById(url);
+            var countSpan = $(element).find(COUNT_CONTAINER_REF);
+            if( countSpan.text() == '') {
+              countSpan.text(0);
+            }
+          }
+        })
+        .fail(function (object, error) {
+          console.log("Error: " + error.code + " " + error.message);
+        });
+    }
+
+    function addCount(Counter) {
+      var $visitors = $(".leancloud_visitors");
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+      var query = new AV.Query(Counter);
+
+      query.equalTo("url", url);
+      query.find({
+        success: function(results) {
+          if (results.length > 0) {
+            var counter = results[0];
+            counter.fetchWhenSave(true);
+            counter.increment("time");
+            
+              var $element = $(document.getElementById(url));
+              $element.find('.leancloud-visitors-count').text(counter.get('time'));
+            
+            counter.save(null, {
+              success: function(counter) {
+                
+              },
+              error: function(counter, error) {
+                console.log('Failed to save Visitor num, with error message: ' + error.message);
+              }
+            });
+          } else {
+            
+              var newcounter = new Counter();
+              /* Set ACL */
+              var acl = new AV.ACL();
+              acl.setPublicReadAccess(true);
+              acl.setPublicWriteAccess(true);
+              newcounter.setACL(acl);
+              /* End Set ACL */
+              newcounter.set("title", title);
+              newcounter.set("url", url);
+              newcounter.set("time", 1);
+              newcounter.save(null, {
+                success: function(newcounter) {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(newcounter.get('time'));
+                },
+                error: function(newcounter, error) {
+                  console.log('Failed to create');
+                }
+              });
+            
+          }
+        },
+        error: function(error) {
+          console.log('Error:' + error.code + " " + error.message);
+        }
+      });
+    }
+
+    $(function() {
+      var Counter = AV.Object.extend("Counter");
+      if ($('.leancloud_visitors').length == 1) {
+        addCount(Counter);
+      } else if ($('.post-title-link').length > 1) {
+        showTime(Counter);
+      }
+    });
+  </script>
+
+
+
+  
+
+  
+<script>
+(function(){
+    var bp = document.createElement('script');
+    var curProtocol = window.location.protocol.split(':')[0];
+    if (curProtocol === 'https') {
+        bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';        
+    }
+    else {
+        bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+    }
+    var s = document.getElementsByTagName("script")[0];
+    s.parentNode.insertBefore(bp, s);
+})();
+</script>
+
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
