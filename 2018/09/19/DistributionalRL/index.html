@@ -102,25 +102,27 @@
 
 
 
-  <meta name="description" content="主要用来练笔，加深知识理解的博客。">
-<meta name="keywords" content="test,others">
+  <meta name="description" content="在传统的强化学习模型中，价值函数（value function）输出的是每个动作（action）在给定状态（state）下的价值 / 期望回报（expected return)。Distributional RL 则假设这个价值是一个随机变量，传统价值函数的输出是这个随机变量的均值。也就是说，传统价值函数的目标是近似地估计价值的期望，而 distributional RL 的目标是近似地估计价值的">
+<meta name="keywords" content="Reinforcement Learning">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://zhang-yi-chi.github.io/2018/04/25/hello-world/index.html">
+<meta property="og:title" content="Distributional Reinforcement Learning">
+<meta property="og:url" content="http://zhang-yi-chi.github.io/2018/09/19/DistributionalRL/index.html">
 <meta property="og:site_name" content="TE">
-<meta property="og:description" content="主要用来练笔，加深知识理解的博客。">
+<meta property="og:description" content="在传统的强化学习模型中，价值函数（value function）输出的是每个动作（action）在给定状态（state）下的价值 / 期望回报（expected return)。Distributional RL 则假设这个价值是一个随机变量，传统价值函数的输出是这个随机变量的均值。也就是说，传统价值函数的目标是近似地估计价值的期望，而 distributional RL 的目标是近似地估计价值的">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2018-04-28T03:33:34.380Z">
+<meta property="og:image" content="http://zhang-yi-chi.github.io/2018/09/19/DistributionalRL/algorithm.png">
+<meta property="og:updated_time" content="2018-09-19T15:05:50.012Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hello World">
-<meta name="twitter:description" content="主要用来练笔，加深知识理解的博客。">
+<meta name="twitter:title" content="Distributional Reinforcement Learning">
+<meta name="twitter:description" content="在传统的强化学习模型中，价值函数（value function）输出的是每个动作（action）在给定状态（state）下的价值 / 期望回报（expected return)。Distributional RL 则假设这个价值是一个随机变量，传统价值函数的输出是这个随机变量的均值。也就是说，传统价值函数的目标是近似地估计价值的期望，而 distributional RL 的目标是近似地估计价值的">
+<meta name="twitter:image" content="http://zhang-yi-chi.github.io/2018/09/19/DistributionalRL/algorithm.png">
 
 
 
 
 
 
-  <link rel="canonical" href="http://zhang-yi-chi.github.io/2018/04/25/hello-world/"/>
+  <link rel="canonical" href="http://zhang-yi-chi.github.io/2018/09/19/DistributionalRL/"/>
 
 
 
@@ -130,7 +132,7 @@
   };
 </script>
 
-  <title>Hello World | TE</title>
+  <title>Distributional Reinforcement Learning | TE</title>
   
 
 
@@ -294,7 +296,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://zhang-yi-chi.github.io/2018/04/25/hello-world/">
+    <link itemprop="mainEntityOfPage" href="http://zhang-yi-chi.github.io/2018/09/19/DistributionalRL/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="YZ">
@@ -311,7 +313,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Hello World
+          <h1 class="post-title" itemprop="name headline">Distributional Reinforcement Learning
               
             
           </h1>
@@ -336,7 +338,7 @@
                 
               
 
-              <time title="创建时间：2018-04-25 11:03:57" itemprop="dateCreated datePublished" datetime="2018-04-25T11:03:57+08:00">2018-04-25</time>
+              <time title="创建时间：2018-09-19 22:35:24" itemprop="dateCreated datePublished" datetime="2018-09-19T22:35:24+08:00">2018-09-19</time>
             
 
             
@@ -351,9 +353,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/25/hello-world/#comments" itemprop="discussionUrl">
+                <a href="/2018/09/19/DistributionalRL/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/25/hello-world/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2018/09/19/DistributionalRL/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -361,7 +363,7 @@
 
           
           
-             <span id="/2018/04/25/hello-world/" class="leancloud_visitors" data-flag-title="Hello World">
+             <span id="/2018/09/19/DistributionalRL/" class="leancloud_visitors" data-flag-title="Distributional Reinforcement Learning">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -392,7 +394,27 @@
       
 
       
-        <p>主要用来练笔，加深知识理解的博客。</p>
+        <p>在传统的强化学习模型中，价值函数（value function）输出的是每个动作（action）在给定状态（state）下的价值 / 期望回报（expected return)。Distributional RL 则假设这个价值是一个随机变量，传统价值函数的输出是这个随机变量的均值。也就是说，传统价值函数的目标是近似地估计价值的期望，而 distributional RL 的目标是近似地估计价值的分布（概率密度函数）。</p>
+<a id="more"></a>
+<h3 id="什么是-Distributional-RL"><a href="#什么是-Distributional-RL" class="headerlink" title="什么是 Distributional RL"></a>什么是 Distributional RL</h3><p>Bellman’s Equation 描述了当前状态 x 下采用一个动作 a 的期望回报（即价值）等于期望奖励加未来的期望回报<br>$$Q(x, a) = \mathbb{E} R(x, a) + \gamma \mathbb{E} Q(X, A)$$</p>
+<p>所以，学习价值的概率分布显然要比只学习它的期望更加靠谱。例如，假设 $(x, a)$ 的真实的概率分布是一个关于 $a$ 的取值对称双峰分布，那么单单预测一个固定的期望回报显然不能很好的评估当前状态的价值，在训练过程中也容易陷入 local minimum （一个峰）。而一个设置良好的概率分布受到的影响会小得多，比如我就假定价值分布是一个有两个中心的高斯混合模型。</p>
+<p>Distributional RL 这个概念和 Bellman’s equation 一样“古老”，去年（2017年）DeepMind 在 ICML 上发表的一篇文章 A Distributional Perspective on Reinforcement Learning 将这个概念带到了一个新的高度。理论推导和实验都表明，论文中 Distributional RL 模型 C51 相比传统 DQN 在收敛速度和结果上都取得了显著的提升。因此，DeepMind 在这之后的 DQN 文章（如 <a href="https://arxiv.org/pdf/1710.02298.pdf" target="_blank" rel="noopener">Rainbow</a>）大都将 distributional RL 当作标准配置。下面将详细讲一下论文的核心概念。</p>
+<h3 id="A-Distributional-Perspective-on-Reinforcement-Learning（论文）"><a href="#A-Distributional-Perspective-on-Reinforcement-Learning（论文）" class="headerlink" title="A Distributional Perspective on Reinforcement Learning（论文）"></a>A Distributional Perspective on Reinforcement Learning（<a href="https://arxiv.org/pdf/1707.06887.pdf" target="_blank" rel="noopener">论文</a>）</h3><h4 id="Distributional-Bellman’s-Equation"><a href="#Distributional-Bellman’s-Equation" class="headerlink" title="Distributional Bellman’s Equation"></a>Distributional Bellman’s Equation</h4><p>论文定义了一个随机变量 $Z$，它的均值是传统价值函数的输出，它的概率分布称为价值分布（value distribution），并由此得到 distributional Bellman’s equation</p>
+<p>$$Z(x, a) = R(x, a) + \gamma Z(X’, A’)$$</p>
+<p>传统的 Bellman’s equation 描述的是当前价值和未来的价值之间的关系。Distributional Bellman’s equation 描述的则是当前价值分布和未来价值分布之间的关系。公式中等号在这里的意思是，等号两边的随机变量是同分布的。</p>
+<h4 id="Parametric-Distribution"><a href="#Parametric-Distribution" class="headerlink" title="Parametric Distribution"></a>Parametric Distribution</h4><p>要学习这个随机变量 $Z$，<strong>首先要确定它的概率分布是什么形式</strong>。之前有研究使用高斯分布，本文中使用的是参数分布（parametric distribution）的形式，即分布的形状由一组可学习的参数控制。具体的，价值分布是由 N 个参数 ${\theta_i}$ 控制的一个离散分布，它的支撑（support，概率不为0的点）由 $\{z_i\}$ 构成，也就是均匀分布在 $V_{\min}$ 和 $V_{\max}$ 中的N个点，概率分布定义如下</p>
+<p>$$Z_\theta (x, a) = z_i \text{  w.p.  } p_i (x, a) = \frac{e^{\theta_i(x, a)}}{\sum_je^{\theta_j(x, a)}} $$</p>
+<p>模型的目标就是学习每个支撑的参数函数 $\{\theta_i\}$。与 value-based 模型类似，价值分布训练的过程就是给定一个 $\text{transition} (x, a, r, x’)$，要让 $Z(x, a)$ 和 $\mathcal{T}Z = r + \gamma Z(x’, \pi(x’))$ 的分布尽可能相同，其中 $\pi$ 是 greedy 或者 $\epsilon$ greedy policy。</p>
+<h4 id="Categorical-Projection"><a href="#Categorical-Projection" class="headerlink" title="Categorical Projection"></a>Categorical Projection</h4><p>上述的分布形式有一个问题，就是在训练的过程中 distributional Bellman’s equation 右边计算得到的值往往不在这些支撑上（由于 reward 和 $\gamma$）， 导致我们无法更新支撑的概率参数。本文就提出了一个很巧妙的方法解决这个问题，文中称为 categorical projection。因为计算得到的 sample Bellman update $\hat{\mathcal{T}}Z_{\theta}$ 应该和 $Z_{\theta}$ 同分布，给定 $\text{transition} (x, a, r, x’)$，$\hat{\mathcal{T}}z_j = \mathcal{T}Z_{\theta_j}(x, a)$ 的概率和 $z_j = Z_{\theta_j}(x’, \pi(x’))$ 的概率 $p_{j} (x’, \pi(x’))$ 相同。由于 $\hat{\mathcal{T}}z_j$ 有可能不是支撑，那么我们就把 $p_j (x’, \pi(x’))$，也就是它的<strong>概率按比例分配到距离它最近的支撑上</strong>，这也是论文中公式（7）的含义。</p>
+<p>$$(\Phi\hat{\mathcal{T}}Z_\theta(x, a))_i = \sum^{N-1}_{j=0} \left[1-\frac{|[\hat{\mathcal{T}}z_j]^{V_{\text{MAX}}}_{V_{\text{MIN}}} - z_i|}{\Delta z}\right]^1_0 p_j(x’, \pi(x’))$$</p>
+<p>最后，根据 distributional Bellman’s equation，分配过后得到的分布 $\Phi \hat{\mathcal{T}}Z_{\theta}$ 和 $Z_{\theta}$ 应该是同分布的，因此以 KL divergence 为损失函数，我们可以通过梯度下降的方法来训练模型。上述过程在论文中被称为 Categorical Algorithm，用此方法训练的 DQN 模型被称为 Categorical DQN，模型C51的含义就是有51个支撑的 Categorical DQN。</p>
+<img src="/2018/09/19/DistributionalRL/algorithm.png" title="Categorical Algorithm">
+<h4 id="网络结构及-Tensorflow-实现"><a href="#网络结构及-Tensorflow-实现" class="headerlink" title="网络结构及 Tensorflow 实现"></a>网络结构及 Tensorflow 实现</h4><p>模型的网络结构与一般的DQN类似，区别在于：传统 DQN 最后一层输出的是一个 $N$ 维的向量，表示 $N$ 个动作对应的价值，Categorical DQN 输出的是 $N \times M$ 维的向量，表示的是 $N$ 个动作在 $M$ 个价值分布的支撑上的概率。Google 新发布的强化学习研究框架 <a href="https://github.com/google/dopamine" target="_blank" rel="noopener">Dopamine</a> 中有一个很简洁的<a href="https://github.com/google/dopamine/blob/master/dopamine/agents/rainbow/rainbow_agent.py" target="_blank" rel="noopener">实现</a>，还附带了一个例子说明每一步计算是做什么的，可以加深对算法的理解。</p>
+<h3 id="其他形式的-Distributional-RL"><a href="#其他形式的-Distributional-RL" class="headerlink" title="其他形式的 Distributional RL"></a>其他形式的 Distributional RL</h3><p>除了 Categorical DQN 这种类型，研究人员还探索了不同形式的 Distributional RL：</p>
+<ul>
+<li>Distributed Distributional Deterministic Policy Gradients (D4PG，<a href="https://arxiv.org/pdf/1804.08617" target="_blank" rel="noopener">论文</a>)。D4PG 将 categorical 这种形式用在 Actor-Critic 类强化学习算法的 Critic 网络上。D4PG 的想法是很自然且合理的，因为 Critic 网络本身就是一个价值判断网络，与 DQN 中的 value function 起到相同的作用。这篇文章说明 distributional RL 的思想也适用于 Continuous Control 领域，效果还不错。</li>
+<li>Implicit Quantile Networks for Distributional Reinforcement Learning (IQN，<a href="https://arxiv.org/pdf/1806.06923.pdf" target="_blank" rel="noopener">论文</a>，<a href="https://github.com/google/dopamine/blob/master/dopamine/agents/implicit_quantile/implicit_quantile_agent.py" target="_blank" rel="noopener">代码</a>)。Categorical 的方法虽然将预测期望回报拓展到了预测价值分布，但是模型在做决策时仍然使用的是期望回报（见上小节 Algorithm 1 里的前3行）。并且，Categorical 方法要确定一组先验且离散的支撑。通过估计分布的百分点函数 （quantile function）， IQN 可以输出连续的期望回报，这种灵活性使得它的性能相比 C51 有很大的提升。IQN 是之前的 QR-DQN 模型（<a href="https://arxiv.org/pdf/1710.10044.pdf" target="_blank" rel="noopener">论文</a>）的加强版。</li>
+</ul>
 
       
     </div>
@@ -413,9 +435,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/test/" rel="tag"># test</a>
-          
-            <a href="/tags/others/" rel="tag"># others</a>
+            <a href="/tags/Reinforcement-Learning/" rel="tag"># Reinforcement Learning</a>
           
         </div>
       
@@ -428,15 +448,15 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
+              <a href="/2018/06/25/attention/" rel="next" title="Attention Model">
+                <i class="fa fa-chevron-left"></i> Attention Model
+              </a>
+            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/04/25/vae/" rel="prev" title="Variational Autoencoder">
-                Variational Autoencoder <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -495,8 +515,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -570,6 +599,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是-Distributional-RL"><span class="nav-number">1.</span> <span class="nav-text">什么是 Distributional RL</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#A-Distributional-Perspective-on-Reinforcement-Learning（论文）"><span class="nav-number">2.</span> <span class="nav-text">A Distributional Perspective on Reinforcement Learning（论文）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Distributional-Bellman’s-Equation"><span class="nav-number">2.1.</span> <span class="nav-text">Distributional Bellman’s Equation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Parametric-Distribution"><span class="nav-number">2.2.</span> <span class="nav-text">Parametric Distribution</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Categorical-Projection"><span class="nav-number">2.3.</span> <span class="nav-text">Categorical Projection</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#网络结构及-Tensorflow-实现"><span class="nav-number">2.4.</span> <span class="nav-text">网络结构及 Tensorflow 实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他形式的-Distributional-RL"><span class="nav-number">3.</span> <span class="nav-text">其他形式的 Distributional RL</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -718,9 +763,9 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'http://zhang-yi-chi.github.io/2018/04/25/hello-world/';
-        this.page.identifier = '2018/04/25/hello-world/';
-        this.page.title = 'Hello World';
+        this.page.url = 'http://zhang-yi-chi.github.io/2018/09/19/DistributionalRL/';
+        this.page.identifier = '2018/09/19/DistributionalRL/';
+        this.page.title = 'Distributional Reinforcement Learning';
       };
       function loadComments () {
         var d = document, s = d.createElement('script');
@@ -902,6 +947,29 @@
   
   
 
+  
+    
+      <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    });
+</script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+    });
+</script>
+<script type="text/javascript" src="//cdn.jsdelivr.net/npm/mathjax@2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
   
 
 
