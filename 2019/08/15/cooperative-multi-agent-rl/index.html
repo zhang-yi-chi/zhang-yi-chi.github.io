@@ -102,27 +102,31 @@
 
 
 
-  <meta name="description" content="本文主要内容是解读《Auto-encoding variational bayes》这篇论文。一直很喜欢这种有（数学或统计）理论基础的研究，比凑出来的深度学习模型不知道要高到哪里去。">
-<meta name="keywords" content="Deep Learning,Machine Learning,VAE,Generative Model">
+  <meta name="description" content="在现实任务中，智能体间的合作是至关重要的。比如，在足球游戏中，球员们除了发挥个人能力外，也需要通过传球配合的方式进攻。本文的主题是，如何利用强化学习构建具有合作能力的多智能体（multi-agent）系统。在这样的系统设置下，每个单智能体（single-agent）只能接触到部分状态信息（POMDP问题），单纯的最大化单智能体的期望回报可能与系统整体利益不符，因此直接使用一般的单智能体强化学习算法">
+<meta name="keywords" content="Reinforcement Learning">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Variational Autoencoder">
-<meta property="og:url" content="http://zhang-yi-chi.github.io/2018/04/25/vae/index.html">
+<meta property="og:title" content="Cooperative Multi-Agent Reinforcement Learning">
+<meta property="og:url" content="http://zhang-yi-chi.github.io/2019/08/15/cooperative-multi-agent-rl/index.html">
 <meta property="og:site_name" content="TE">
-<meta property="og:description" content="本文主要内容是解读《Auto-encoding variational bayes》这篇论文。一直很喜欢这种有（数学或统计）理论基础的研究，比凑出来的深度学习模型不知道要高到哪里去。">
+<meta property="og:description" content="在现实任务中，智能体间的合作是至关重要的。比如，在足球游戏中，球员们除了发挥个人能力外，也需要通过传球配合的方式进攻。本文的主题是，如何利用强化学习构建具有合作能力的多智能体（multi-agent）系统。在这样的系统设置下，每个单智能体（single-agent）只能接触到部分状态信息（POMDP问题），单纯的最大化单智能体的期望回报可能与系统整体利益不符，因此直接使用一般的单智能体强化学习算法">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://zhang-yi-chi.github.io/2018/04/25/vae/aevb.png">
-<meta property="og:updated_time" content="2018-05-01T23:37:25.229Z">
+<meta property="og:image" content="http://zhang-yi-chi.github.io/2019/08/15/cooperative-multi-agent-rl/vdni.png">
+<meta property="og:image" content="http://zhang-yi-chi.github.io/2019/08/15/cooperative-multi-agent-rl/vdnl.png">
+<meta property="og:image" content="http://zhang-yi-chi.github.io/2019/08/15/cooperative-multi-agent-rl/vdnh.png">
+<meta property="og:image" content="http://zhang-yi-chi.github.io/2019/08/15/cooperative-multi-agent-rl/qmix.png">
+<meta property="og:image" content="http://zhang-yi-chi.github.io/2019/08/15/cooperative-multi-agent-rl/coma.png">
+<meta property="og:updated_time" content="2019-08-16T06:22:50.299Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Variational Autoencoder">
-<meta name="twitter:description" content="本文主要内容是解读《Auto-encoding variational bayes》这篇论文。一直很喜欢这种有（数学或统计）理论基础的研究，比凑出来的深度学习模型不知道要高到哪里去。">
-<meta name="twitter:image" content="http://zhang-yi-chi.github.io/2018/04/25/vae/aevb.png">
+<meta name="twitter:title" content="Cooperative Multi-Agent Reinforcement Learning">
+<meta name="twitter:description" content="在现实任务中，智能体间的合作是至关重要的。比如，在足球游戏中，球员们除了发挥个人能力外，也需要通过传球配合的方式进攻。本文的主题是，如何利用强化学习构建具有合作能力的多智能体（multi-agent）系统。在这样的系统设置下，每个单智能体（single-agent）只能接触到部分状态信息（POMDP问题），单纯的最大化单智能体的期望回报可能与系统整体利益不符，因此直接使用一般的单智能体强化学习算法">
+<meta name="twitter:image" content="http://zhang-yi-chi.github.io/2019/08/15/cooperative-multi-agent-rl/vdni.png">
 
 
 
 
 
 
-  <link rel="canonical" href="http://zhang-yi-chi.github.io/2018/04/25/vae/"/>
+  <link rel="canonical" href="http://zhang-yi-chi.github.io/2019/08/15/cooperative-multi-agent-rl/"/>
 
 
 
@@ -132,7 +136,7 @@
   };
 </script>
 
-  <title>Variational Autoencoder | TE</title>
+  <title>Cooperative Multi-Agent Reinforcement Learning | TE</title>
   
 
 
@@ -296,7 +300,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://zhang-yi-chi.github.io/2018/04/25/vae/">
+    <link itemprop="mainEntityOfPage" href="http://zhang-yi-chi.github.io/2019/08/15/cooperative-multi-agent-rl/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="YZ">
@@ -313,7 +317,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Variational Autoencoder
+          <h1 class="post-title" itemprop="name headline">Cooperative Multi-Agent Reinforcement Learning
               
             
           </h1>
@@ -338,7 +342,7 @@
                 
               
 
-              <time title="创建时间：2018-04-25 23:03:09" itemprop="dateCreated datePublished" datetime="2018-04-25T23:03:09+08:00">2018-04-25</time>
+              <time title="创建时间：2019-08-15 23:06:07" itemprop="dateCreated datePublished" datetime="2019-08-15T23:06:07+08:00">2019-08-15</time>
             
 
             
@@ -353,9 +357,9 @@
                 <span class="post-meta-item-icon">
                   <i class="fa fa-comment-o"></i>
                 </span>
-                <a href="/2018/04/25/vae/#comments" itemprop="discussionUrl">
+                <a href="/2019/08/15/cooperative-multi-agent-rl/#comments" itemprop="discussionUrl">
                   <span class="post-comments-count disqus-comment-count"
-                        data-disqus-identifier="2018/04/25/vae/" itemprop="commentCount"></span>
+                        data-disqus-identifier="2019/08/15/cooperative-multi-agent-rl/" itemprop="commentCount"></span>
                 </a>
               </span>
             
@@ -363,7 +367,7 @@
 
           
           
-             <span id="/2018/04/25/vae/" class="leancloud_visitors" data-flag-title="Variational Autoencoder">
+             <span id="/2019/08/15/cooperative-multi-agent-rl/" class="leancloud_visitors" data-flag-title="Cooperative Multi-Agent Reinforcement Learning">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -394,37 +398,32 @@
       
 
       
-        <p>本文主要内容是解读《<a href="https://arxiv.org/pdf/1312.6114.pdf" target="_blank" rel="noopener">Auto-encoding variational bayes</a>》这篇论文。一直很喜欢这种有（数学或统计）理论基础的研究，比凑出来的深度学习模型不知道要高到哪里去。</p>
+        <p>在现实任务中，智能体间的合作是至关重要的。比如，在足球游戏中，球员们除了发挥个人能力外，也需要通过传球配合的方式进攻。本文的主题是，如何利用强化学习构建具有合作能力的多智能体（multi-agent）系统。在这样的系统设置下，每个单智能体（single-agent）只能接触到部分状态信息（POMDP问题），单纯的最大化单智能体的期望回报可能与系统整体利益不符，因此直接使用一般的单智能体强化学习算法很难起效。下面将介绍3种模型，他们采取不同的方法构建智能体间的通信机制，实现了期望的合作行为。</p>
 <a id="more"></a>
-<h3 id="问题背景"><a href="#问题背景" class="headerlink" title="问题背景"></a>问题背景</h3><p>假设一组数据 $X = \lbrace\mathbf{x}^{(i)}\rbrace_{i=n}^{N}$ 是随机生成的，并且随机生成的过程与一个隐藏变量（Latent Variable）$\mathbf{z}$ 有关，我们想要得到数据的一个（近似的）概率密度函数 $p(\mathbf{x})$ 来代表这组数据。这个随机的生成过程有以下两步：(1) 从先验分布 $p_\mathbf{\theta}(\mathbf{z})$ 中生成 $\mathbf{z}^{(i)}$；(2) 从条件概率 $p_\mathbf{\mathbf{\theta}}(\mathbf{x}|\mathbf{z})$ 中生成 $\mathbf{x}^{(i)}$。由此，问题转换为求解 $\mathbf{\theta}$。这种假设在一定程度上是合理的，比如说在MNIST手写数字数据集中，我们想生成数字“1”的图片。首先我们要确定要生成数字是“1”，这对应第一步，然后我们在目标是数字“1”的条件下，通过某些方法生成相应的图片，这对应第二步。当然，实际的情况可能要更复杂，我们往往不能确定 $\mathbf{z}$ 究竟有什么实际含义，只知道它包含了一类数据的信息。我们对数据的概率分布 $p(\mathbf{x})$ 感兴趣，是因为有很多实际应用需要数据的 prior，比如 denoising<a href="#dvae-ref">[2]</a><a name="dvae-in"></a>, inpainting 还有 super-resolution。除此之外我们也对后验分布 $p_\mathbf{\mathbf{\theta}}(\mathbf{z}|\mathbf{x})$ 也感兴趣，因为 latent variable $\mathbf{z}$可以当作一个数据的 embedding。</p>
-<p>一般情况下，我们可以用 Maximum Likelihood，即$\mathbf{\theta} = \text{argmax}_{\mathbf{\theta}} p_\mathbf{\theta}(\mathbf{x})$ 或者 Expectation Maximization 的方法求解$\mathbf{\theta}$。但是当模型很复杂时，$p_\mathbf{\theta}(\mathbf{x}) = \int p_\mathbf{\theta}(\mathbf{z})p_\mathbf{\mathbf{\theta}}(\mathbf{x}|\mathbf{z}) d\mathbf{z}$ 给不出具体的公式表达（intractable），所以也就没法用ML来求解，因为我们不知道 gradient 的表达式。后验分布 $p_\mathbf{\mathbf{\theta}}(\mathbf{z}|\mathbf{x}) = p_\mathbf{\mathbf{\theta}}(\mathbf{x}|\mathbf{z}) p_\mathbf{\theta}(\mathbf{z}) / p_\mathbf{\theta}(\mathbf{x})$ 也是如此，所以EM也不能用（不知道$q(\mathbf{z})$）。概率分布 intractable 的情况并不少见，比如说我们用神经网络+sigmoid/softmax 来表达概率函数。Variational inference 可以用来解决 intractabililty 的问题。</p>
-<p>大体上来说，variational inference 是指用一个简单的，可计算的概率分布$q$来近似估计复杂分布$p$，最小化 KL divergence $D_{KL}(q || p) = \int q(\mathbf{z}) \log \frac{q(\mathbf{z})}{p(\mathbf{z})} d\mathbf{z}$。为了解决上面提到的问题，我们用一个函数 $q_{\mathbf{\phi}}(\mathbf{z} | \mathbf{x})$ 来估计 intractable 的后验分布 $p_\mathbf{\mathbf{\theta}}(\mathbf{z}|\mathbf{x})$，这样我们既可以近似的估计后验分布，在选择适当的条件概率 $p_{\mathbf{\theta}}(\mathbf{x}|\mathbf{z})$ 和隐藏变量的先验分布 $p_\mathbf{\theta}(\mathbf{z})$ 后，我们能够得到 $p(\mathbf{x})$ 的一个近似估计。在论文<a href="#aevb-ref">[1]</a>中，作者提出了一个 variational bayes 的方法同时求解近似分布的参数 $\mathbf{\phi}$ 和条件概率参数 $\mathbf{\theta}$。算法叫 autoencoder 的原因是，可以把 $q_{\mathbf{\phi}}(\mathbf{z} | \mathbf{x})$ 当作一个 encoder ，$p_{\mathbf{\theta}}(\mathbf{x}|\mathbf{z})$ 当作 decoder，最后作者结合神经网络给出的例子也确实像一个 autoencoder。</p>
-<h3 id="Variational-Bound"><a href="#Variational-Bound" class="headerlink" title="Variational Bound"></a>Variational Bound</h3><p>利用近似后验分布 $q$，我们可以构建一个数据概率(log) $p_\mathbf{\theta}(\mathbf{x})$ 的下界：<br>$$\begin{eqnarray}<br>log p_\mathbf{\theta}(\mathbf{x}^{(i)}) &amp;=&amp; D_{KL} (q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)}) || p_\mathbf{\theta}(\mathbf{z} | \mathbf{x}^{(i)})) + \mathcal{L}({\bf \theta},{\bf \phi}; {\bf x}^{(i)})   \\\<br>&amp;\geq&amp; \mathcal{L}({\bf \theta},{\bf \phi}; {\bf x}^{(i)})<br>\end{eqnarray} \tag{1}$$</p>
-<p>不等式中的大于等于是因为 KL divergence 恒大于等于0，其中 $\mathcal{L}$ 具体表达式有两种形式，<br>$$\begin{eqnarray}<br>\mathcal{L}({\bf \theta},{\bf \phi}; {\bf x}^{(i)}) &amp;=&amp; \mathbb{E}_{q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})} [-\log q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)}) + \log p_\mathbf{\theta}(\mathbf{x}^{(i)}, \mathbf{z})]   \\\<br>&amp;=&amp; -D_{KL} (q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)}) || p_\mathbf{\theta}(\mathbf{z})) + \mathbb{E}_{q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})} [\log p_\mathbf{\theta}(\mathbf{x}^{(i)} | \mathbf{z})]<br>\end{eqnarray} \tag{2}$$</p>
-<p>其中第二种形式更加符合 autoencoder 的定义，等号右边第二项期望 reconstruction error，而第一项相当于一个 regularization，使 $q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})$ 尽量靠近先验分布 $p_\mathbf{\theta}(\mathbf{z})$。这两项优化的方向实际上是矛盾的，毕竟为了得到一个很好的 reconstruction，$\mathbf{z}$ 关于 $\mathbf{x}$ 的条件概率不可能与其先验概率一样。</p>
-<p>这样，我们可以通过不断优化（提高）$\mathcal{L}({\bf \theta},{\bf \phi}; {\bf x}^{(i)})$ w.r.t. ${\bf \theta}$ 和 ${\bf \phi}$ 来得到我们想要的结果。优化之前有两个问题需要解决，一是如何选择 $q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})$和$p_{\mathbf{\theta}}(\mathbf{x}|\mathbf{z})$，二是怎么处理公式中的期望。一般来说我们会使用 Monte Carlo sampling 的方法近似估计期望值，不过这种方法会带来很大的方差，计算效率也很低。</p>
-<h3 id="Auto-Encoding-Variational-Bayes-Algorithm"><a href="#Auto-Encoding-Variational-Bayes-Algorithm" class="headerlink" title="Auto-Encoding Variational Bayes Algorithm"></a>Auto-Encoding Variational Bayes Algorithm</h3><p>论文<a href="#aevb-ref">[1]</a><a name="aevb-in"></a>中提出了一种全新的优化 $\mathcal{L}({\bf \theta},{\bf \phi}; {\bf x}^{(i)})$ w.r.t. ${\bf \theta}$和${\bf \phi}$ 的方法，简单来说就是 Monte Carlo 方法 + Reparameterization trick。</p>
-<p>Monte Carlo 方法用来估计期望的值。具体到本问题中，$\mathbb{E}_{q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})} [f(\mathbf{z})]$ 及其 gradient 是我们需要估计的，$f(\mathbf{z})$ 用来代指期望内的公式。估计方法如下<br>$$\mathbb{E}_{q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})} [f(\mathbf{z})] \simeq \frac{1}{L} \sum_{l=1}^L f(\mathbf{z}^{(l)}) \tag{3}$$</p>
-<p>其中 $\mathbf{z}^{(l)}$ 是从概率分布 $q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})$ 里抽样出来的。这是一个无偏估计。但是考虑到 gradient $\nabla_{\mathbf{\phi}} \mathbb{E}_{q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})} [f(\mathbf{z})]$, $\nabla_{\mathbf{\phi}}$ 不能直接作用到期望里面，因为积分 $\int f(\mathbf{z}) \nabla_{\mathbf{\phi}} q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})$ 不再代表期望，进而不能使用 Monte Carlo 估计。一种解决方法是用一个数学变换，可以得到 <a name="eq4"></a><br>$$\int f(\mathbf{z}) \nabla_{\mathbf{\phi}} q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)}) = \int f(\mathbf{z}) q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)}) \nabla_{q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})} \log q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)}) = \mathbb{E}_{q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})} [f(\mathbf{z}) \nabla_{q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})} \log q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})] \tag{4}$$</p>
-<p>但是这种方法会带来很大的 variance。 reparameterization 可以用来解决这个问题。</p>
-<p>上面说到，$\nabla_{\mathbf{\phi}}$ 不能直接放入期望中是因为期望的概率分布 $q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})$和变量$\mathbf{\phi}$ 有关，reparameterization 就是用来把变量 $\mathbf{\phi}$ 移出概率分布。具体的，我们可以引入一个随机变量 $\epsilon$ 以及它的概率分布 $p(\epsilon)$，使得之前的随机变量 $\mathbf{z}$ 是 $\epsilon$ 的一个与 $\phi$ 有关的可导的变换（一一对应），$\mathbf{z} = g_{\phi}(\epsilon, \mathbf{x})$。这样，我们就有 $q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)}) = p(\epsilon, \mathbf{x}^{(i)})$, $\mathbb{E}_{q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})} [f(\mathbf{z})] = \mathbb{E}_{p(\epsilon)} [f(g_{\phi}(\epsilon, \mathbf{x}))]$，进而可以把$\nabla_{\mathbf{\phi}}$ 直接放到期望内，利用 Monte Carlo 估计求得 gradient。</p>
-<p>运用到 $\mathcal{L}({\bf \theta},{\bf \phi}; {\bf x}^{(i)})$ 的第一种形式里去，我们得到</p>
-<p>$$\mathcal{L}({\bf \theta},{\bf \phi}; {\bf x}^{(i)}) \simeq \frac{1}{L} \sum_{l=1}^{L} -\log q_\mathbf{\phi}(\mathbf{z}^{(i,l)} | \mathbf{x}^{(i)}) + \log p_\mathbf{\theta}(\mathbf{x}^{(i)}, \mathbf{z}^{(i,l)}) \tag{5}$$</p>
-<p>$$\text{where  } \mathbf{z}^{(i,l)} = g_{\phi}(\epsilon^{(l)}, \mathbf{x}^{(i)}) \text{ and } \epsilon^{(l)} \sim p(\epsilon) \tag{6}$$</p>
-<p>并且我们可以直接对上式关于$\phi$和 $\theta$ 求导，利用SGD训练。</p>
-<p>如果 $-D_{KL} (q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)}) || p_\mathbf{\theta}(\mathbf{z}))$ 是解析的（analytically），即有明确的数学表达，我们也可以利用 $\mathcal{L}$ 的第二种形式</p>
-<p>$$\mathcal{L}({\bf \theta},{\bf \phi}; {\bf x}^{(i)}) \simeq -D_{KL} (q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)}) || p_\mathbf{\theta}(\mathbf{z})) + \frac{1}{L} \sum_{l=1}^{L} \log p_\mathbf{\theta}(\mathbf{x}^{(i)} | \mathbf{z}^{(i,l)}) \tag{7}$$</p>
-<p>$$\text{where } \mathbf{z}^{(i,l)} = g_{\phi}(\epsilon^{(l)}, \mathbf{x}^{(i)}) \text{ and } \epsilon^{(l)} \sim p(\epsilon) \tag{8}$$</p>
-<p>解决了期望计算求导的问题，我们就得到了如下的算法</p>
-<img src="/2018/04/25/vae/aevb.png" title="Auto-Encoding Variational Bayes Algorithm">
-<h3 id="Variational-Autoencoder"><a href="#Variational-Autoencoder" class="headerlink" title="Variational Autoencoder"></a>Variational Autoencoder</h3><p>关于 $q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})$，$p(\epsilon)$，$p_\mathbf{\theta}(\mathbf{z})$ 和 $p_{\mathbf{\theta}}(\mathbf{x}|\mathbf{z})$ 如何选择，文中给出了一个具体的例子，即本文的主角 variational autoencoder。</p>
-<p>首先，$q_\mathbf{\phi}(\mathbf{z} | \mathbf{x}^{(i)})$ 是一个正态分布 $\mathcal{N}(\mathbf{z}; \mu^{(i)}, \sigma^{(i)2}\mathbf{I})$。其中均值 $\mu^{(i)}$ 和标准差 $\sigma^{(i)}$ 是一个以 $\mathbf{x}^{(i)}$ 为输入的 neural network 的输出。$\epsilon$ 服从一个标准正态分布 $\mathcal{N}(\epsilon;\mathbf{0},\mathbf{I})$，所以我们有<br>$$\mathbf{z}^{(i,l)} = g_{\phi}(\epsilon^{(l)}, \mathbf{x}^{(i)}) = \mu^{(i)} + \sigma^{(i)} \odot \epsilon^{(l)} \tag{9}$$</p>
-<p>先验分布 $p_\mathbf{\theta}(\mathbf{z})$ 也服从标准正态分布 $\mathcal{N}(\mathbf{z};\mathbf{0},\mathbf{I})$，这么选择是因为这样可以极大的简化 KL divergence 的计算。</p>
-<p>最后，$p_{\mathbf{\theta}}(\mathbf{x}|\mathbf{z})$ 是一个 neural network + non-linear layer 的输出，以 $\mathbf{z}^{(i,l)}$ 为输入。</p>
-<p>综上，我们可以得到 variational autoencoder 的 objective function, 需要训练的参数 $\phi$ 和 $\theta$ 分别是作为 encoder 和 decoder 的 neural network 的参数，用 minibatch SGD 的方法训练模型最大化下面的函数<br>$$\mathcal{L}({\bf \theta},{\bf \phi}; {\bf x}^{(i)}) \simeq \frac{1}{2} \sum_{j=1}^{J} (1 + log((\sigma^{(i)}_j)^2) - (\mu^{(i)}_j)^2 - (\sigma^{(i)}_j)^2) + \frac{1}{L} \sum_{l=1}^{L} \log p_\mathbf{\theta}(\mathbf{x}^{(i)} | \mathbf{z}^{(i,l)}) \tag{10}$$</p>
-<p>$$\text{where } \mathbf{z}^{(i,l)} =  \mu^{(i)} + \sigma^{(i)} \odot \epsilon^{(l)} \text{ and } \epsilon^{(l)} \sim \mathcal{N}(\mathbf{\epsilon};\mathbf{0},\mathbf{I}) \tag{11}$$</p>
-<p>pytorch 官方提供了一个简单明了的VAE实现<a href="https://github.com/pytorch/examples/tree/master/vae" target="_blank" rel="noopener">https://github.com/pytorch/examples/tree/master/vae</a>，对理解AEVB算法的整个流程很有帮助。</p>
-<h3 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h3><p><a name="aevb-ref"></a><a href="#aevb-in">[1]</a> <a href="https://arxiv.org/pdf/1312.6114.pdf" target="_blank" rel="noopener">Kingma D P, Welling M. Auto-encoding variational bayes[J]. arXiv preprint arXiv:1312.6114, 2013.</a><br><a name="dvae-ref"></a><a href="#dvae-in">[2]</a> <a href="https://arxiv.org/pdf/1511.06406.pdf" target="_blank" rel="noopener">Im D J, Ahn S, Memisevic R, et al. Denoising Criterion for Variational Auto-Encoding Framework[C]//AAAI. 2017: 2059-2065.</a></p>
+<h3 id="Value-Decomposition-Networks-For-Cooperative-Multi-Agent-Learning-论文"><a href="#Value-Decomposition-Networks-For-Cooperative-Multi-Agent-Learning-论文" class="headerlink" title="Value-Decomposition Networks For Cooperative Multi-Agent Learning (论文)"></a>Value-Decomposition Networks For Cooperative Multi-Agent Learning (<a href="https://arxiv.org/pdf/1706.05296.pdf" target="_blank" rel="noopener">论文</a>)</h3><p>如果想要使用基于价值的强化学习模型（value-based），就需要对系统的联合动作-价值函数（joint action-value function，联合$Q$函数）建模。假设系统中有$d$个智能体，则联合$Q$函数可以表示为$Q((h_1, h_2, …, h_d), (a_1, a_2, …, a_d))$，其中$h_i$表示智能体的局部信息，$a_i$表示动作。可以看出，如果使用一般的方法建模，$Q$函数的输出维度是$d^n$，$n$是动作空间的维度。</p>
+<p>Value-Decomposition Networks（VDN）的基本假设是，系统的联合$Q$函数可以近似为多个单智能体的$Q$函数的和：<br>$$Q((h_1, h_2, …, h_d), (a_1, a_2, …, a_d)) = \sum_{i=1}^d {Q}_i (h_i, a_i)$$，<br>其中${Q}_i$之间是独立的，只取决于局部观策和动作$h_i, a_i$。这样可以保证，最大化每个单智能体的${Q}_i$函数得到动作，与通过最大化联合$Q$函数得到的结果是一样的，即<br>$${\max}_{\boldsymbol{a}} Q = {\max}_\boldsymbol{a} \sum_{i=1}^d Q_i = \sum_{i=1}^d {\max}_{a_i} Q_i$$<br>$${\text{argmax}}_{\boldsymbol{a}} Q = ({\text{argmax}}_{a_i} Q_i)$$<br>我们可以通过全局的奖励函数，间接地训练每个单智能体的$Q$函数。并且只要对每个智能体选择最大化${Q}_i$的动作，就能使得全局$Q$值最大。</p>
+<p>文章中还提到，结合以下的技巧，VDN能够得到更好的效果：</p>
+<ol>
+<li>使用<a href="https://arxiv.org/pdf/1507.06527.pdf" target="_blank" rel="noopener">DRQN</a>作为$Q$函数。经试验证明，使用 LSTM 作为$Q$函数网络的输出层在 PODMP 环境下有更强的鲁棒性和泛化能力。</li>
+<li>参数共享（weight sharing）和角色信息（role information）。即所有的单智能体使用同一个$Q$函数网络，同时在输入中加入一个 one-hot 向量来区别不同角色的智能体。</li>
+<li>智能体间的通信（information channels）。本文试验了两种通信方式，一种是在输入时就包括了其他智能体的信息（low level），另一种是结合$Q$网络的高层隐藏变量（high level）再分别输出。</li>
+</ol>
+<p>下面的3张图分别是 VDN, VDN + low level communication, VDN + high level communication 的网络结构。</p>
+<img src="/2019/08/15/cooperative-multi-agent-rl/vdni.png" title="VDN">
+<img src="/2019/08/15/cooperative-multi-agent-rl/vdnl.png" title="VDN with Low Level Communication">
+<img src="/2019/08/15/cooperative-multi-agent-rl/vdnh.png" title="VDN with high level Communication">
+<h3 id="QMIX-Monotonic-Value-Function-Factorisation-for-Deep-Multi-Agent-Reinforcement-Learning-论文"><a href="#QMIX-Monotonic-Value-Function-Factorisation-for-Deep-Multi-Agent-Reinforcement-Learning-论文" class="headerlink" title="QMIX: Monotonic Value Function Factorisation for Deep Multi-Agent Reinforcement Learning (论文)"></a>QMIX: Monotonic Value Function Factorisation for Deep Multi-Agent Reinforcement Learning (<a href="https://arxiv.org/pdf/1803.11485.pdf" target="_blank" rel="noopener">论文</a>)</h3><p>VDN 可行的原因可以总结为一个公式：<br>$${\text{argmax}}_{\boldsymbol{a}} Q = ({\text{argmax}}_{a_i} Q_i)$$<br>即联合$Q$函数取最大值等价于每个$Q_i$函数取最大值。</p>
+<p>VDN 中联合函数的表达形式（求和）满足这个条件，但求和这种方式表现力有限，并不能涵盖更加复杂的组合情况，比如非线性组合。事实上，只要满足Q对于任意一个$Q_i$是单调增的（monotonic），$Q_i$和$Q$满足<br>$$\frac{\partial Q}{\partial Q_i} \ge 0 \text{ , } \forall a \in A$$<br>上述等价关系就是成立的。可以看出，VDN 中的求和形式是该条件的一个特例（$\frac{\partial Q}{\partial Q_i} = 1$）。QMIX 模型的核心思想就是在$Q$和$Q_i$之间构造一个单调映射。</p>
+<p>具体的，QMIX 模型由2部分组成，agent networks 输出单智能体的$Q_i$函数，mix network 以$Q_i$作为输入，用于计算联合$Q$函数。为了满足单调的限制，mix network 每一层的参数均由一个 hypernetwork 计算生成。hypernetworks 以当前状态$s$作为输入，输出一个与 mix network 当前层形状相匹配的向量作为参数。 hypernetworks 隐藏层的激活函数是非负的（比如 ReLU），这样得到的 mix network 每一层的参数也都是非负的，从而保证了单调的条件（bias 没有限制）。QMIX 模型结构如下图所示</p>
+<img src="/2019/08/15/cooperative-multi-agent-rl/qmix.png" title="QMIX">
+<p>与 VDN 相比，QMIX 改进了联合$Q$函数的形式，融合了部分全局信息，使得模型的性能有很大的提升。这里需要注意的是，agent networks 并没有使用全局信息，所以这还是一个 POMDP 环境。</p>
+<h3 id="Counterfactual-Multi-Agent-Policy-Gradients-论文"><a href="#Counterfactual-Multi-Agent-Policy-Gradients-论文" class="headerlink" title="Counterfactual Multi-Agent Policy Gradients (论文)"></a>Counterfactual Multi-Agent Policy Gradients (<a href="https://arxiv.org/pdf/1705.08926.pdf" target="_blank" rel="noopener">论文</a>)</h3><p>VDN 和 QMIX 都采用了这样一种结构：中心化计算系统的$Q$函数，单智能体的$Q_i$函数去中心化或者说因子化（factored）。这种结构使得策略在训练的时候可以利用全局信息，同时每个智能体仍然只接受局部信息作为输入。类似的，在 Actor-Critic 框架中，我们同样可以通过分散 Actor， 中心化 Critic 来达到同样的效果，COMA 就采用了这样的思想。此外，COMA 还考虑了另外一个问题：如何合理的分配全局系统奖励（credit assignment）。每个智能体对全局奖励的贡献是不同的，在更新 Actor 网络时，应该考虑到这种不同，分配合理的奖励给不同的 Actor。</p>
+<p>COMA 的做法是，对于一个智能体，计算一个动作的优势函数（advantage function），文章里称为 counterfactual baseline。函数计算，固定其他智能体的动作时，一个智能体的某个动作的Q值与所有动作Q值平均值间的差</p>
+<p>$$A^a (s, \boldsymbol{u}) = Q (s, \boldsymbol{u}) - \sum_{u’^{a}} \pi^a(u’^{a} | \tau^a) Q (s, (\boldsymbol{u}^{-a}, u’^{a})$$</p>
+<p>这里$a$表示某个智能体,$\boldsymbol{u}$表示所有智能体的动作，$\boldsymbol{u}^{-a}$表示除了$a$之外的所有智能体的动作。</p>
+<p>我觉得使用优势函数的动机是，如果智能体做任何动作得到的全局奖励都差不多，那么它的 Actor 这次就不需要太多的更新。为了简化计算，Critic 不会计算所有智能体动作组合的Q值（输出维度是$|U|^n$个），而是针对每一个智能体，将其他智能体的动作当作输入，输出该智能体每个动作对应的$Q$值（输出维度降为$|U|$）。COMA 的结构如下图所示</p>
+<img src="/2019/08/15/cooperative-multi-agent-rl/coma.png" title="COMA">
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><p>幸运的是，有人做过 VDN，QMIX 和 COMA 之间在星际II上的效果对比，还开源了<a href="https://github.com/oxwhirl/pymarl" target="_blank" rel="noopener">模型</a>和<a href="https://github.com/oxwhirl/smac" target="_blank" rel="noopener">环境</a>。VDN 和 QMIX 的实现比较直观，每个智能体都是一个独立的 DRQN 模型，有一个 mixer 融合所有的Q值。COMA 的实现要更有技巧一些，里面用到好多 masking 的方式来区分 Critic 网络的输入属于哪一个智能体。从效果上看，QMIX 要好于 VDN 和 COMA，毕竟它是最后发表的，在 QMIX 文章中也提到 on-policy 模型可能带来 sample-inefficiency 问题。</p>
 
       
     </div>
@@ -445,13 +444,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Deep-Learning/" rel="tag"># Deep Learning</a>
-          
-            <a href="/tags/Machine-Learning/" rel="tag"># Machine Learning</a>
-          
-            <a href="/tags/VAE/" rel="tag"># VAE</a>
-          
-            <a href="/tags/Generative-Model/" rel="tag"># Generative Model</a>
+            <a href="/tags/Reinforcement-Learning/" rel="tag"># Reinforcement Learning</a>
           
         </div>
       
@@ -464,8 +457,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/04/25/hello-world/" rel="next" title="Hello World">
-                <i class="fa fa-chevron-left"></i> Hello World
+              <a href="/2018/09/19/DistributionalRL/" rel="next" title="Distributional Reinforcement Learning">
+                <i class="fa fa-chevron-left"></i> Distributional Reinforcement Learning
               </a>
             
           </div>
@@ -473,10 +466,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/06/25/attention/" rel="prev" title="Attention Model">
-                Attention Model <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -629,7 +618,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题背景"><span class="nav-number">1.</span> <span class="nav-text">问题背景</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Variational-Bound"><span class="nav-number">2.</span> <span class="nav-text">Variational Bound</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Auto-Encoding-Variational-Bayes-Algorithm"><span class="nav-number">3.</span> <span class="nav-text">Auto-Encoding Variational Bayes Algorithm</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Variational-Autoencoder"><span class="nav-number">4.</span> <span class="nav-text">Variational Autoencoder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#参考文献"><span class="nav-number">5.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Value-Decomposition-Networks-For-Cooperative-Multi-Agent-Learning-论文"><span class="nav-number">1.</span> <span class="nav-text">Value-Decomposition Networks For Cooperative Multi-Agent Learning (论文)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#QMIX-Monotonic-Value-Function-Factorisation-for-Deep-Multi-Agent-Reinforcement-Learning-论文"><span class="nav-number">2.</span> <span class="nav-text">QMIX: Monotonic Value Function Factorisation for Deep Multi-Agent Reinforcement Learning (论文)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Counterfactual-Multi-Agent-Policy-Gradients-论文"><span class="nav-number">3.</span> <span class="nav-text">Counterfactual Multi-Agent Policy Gradients (论文)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实现"><span class="nav-number">4.</span> <span class="nav-text">实现</span></a></li></ol></div>
             
 
           </div>
@@ -783,9 +772,9 @@
   
     <script type="text/javascript">
       var disqus_config = function () {
-        this.page.url = 'http://zhang-yi-chi.github.io/2018/04/25/vae/';
-        this.page.identifier = '2018/04/25/vae/';
-        this.page.title = 'Variational Autoencoder';
+        this.page.url = 'http://zhang-yi-chi.github.io/2019/08/15/cooperative-multi-agent-rl/';
+        this.page.identifier = '2019/08/15/cooperative-multi-agent-rl/';
+        this.page.title = 'Cooperative Multi-Agent Reinforcement Learning';
       };
       function loadComments () {
         var d = document, s = d.createElement('script');

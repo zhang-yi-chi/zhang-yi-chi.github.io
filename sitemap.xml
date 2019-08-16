@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://zhang-yi-chi.github.io/2019/08/15/cooperative-multi-agent-rl/</loc>
+    
+    <lastmod>2019-08-16T06:22:50.299Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://zhang-yi-chi.github.io/2018/09/19/DistributionalRL/</loc>
     
     <lastmod>2018-09-19T15:05:50.012Z</lastmod>
